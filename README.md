@@ -1,985 +1,146 @@
-You're right 😭. I misunderstood the deliverable.
+# Movie Recommendation System + Experiment Lab
 
-You want ONE complete README.md, ready to paste into GitHub — with actual tech-stack stickers/badges, senior-architect-level documentation, architecture diagrams, workflows, feature map, ML architecture, system design, API architecture, folder structure, data flow, experiment flow, DevOps, security, testing, setup, research methodology, roadmap, etc.
+> **Research question:** Can a personalized recommendation system improve recommendation accuracy
+> and user satisfaction compared with a non-personalized system?
 
-And importantly: not written like a college assignment.
-
-Here is the corrected version. Copy everything below directly into README.md.
-
-# 🎬 Movie Recommendation System
-
-<p align="center">
-  <strong>Production-Grade Recommendation Engineering & Experimental Research Platform</strong>
-</p>
-
-<p align="center">
-  A modular movie recommendation platform combining content intelligence,
-  collaborative filtering, hybrid recommendation, sentiment analysis,
-  explainability, and reproducible ML experimentation.
-</p>
-
-<p align="center">
-
-![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=for-the-badge&logo=python&logoColor=white)
-![FastAPI](https://img.shields.io/badge/FastAPI-API-009688?style=for-the-badge&logo=fastapi&logoColor=white)
-![Next.js](https://img.shields.io/badge/Next.js-Frontend-000000?style=for-the-badge&logo=next.js&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-Strict-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
-![Tailwind](https://img.shields.io/badge/Tailwind_CSS-UI-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
-![scikit-learn](https://img.shields.io/badge/scikit--learn-ML-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white)
-![Pandas](https://img.shields.io/badge/Pandas-Data-150458?style=for-the-badge&logo=pandas&logoColor=white)
-![NumPy](https://img.shields.io/badge/NumPy-Computing-013243?style=for-the-badge&logo=numpy&logoColor=white)
-![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-ORM-D71F00?style=for-the-badge)
-![SQLite](https://img.shields.io/badge/SQLite-Database-003B57?style=for-the-badge&logo=sqlite&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED?style=for-the-badge&logo=docker&logoColor=white)
-![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-CI%2FCD-2088FF?style=for-the-badge&logo=github-actions&logoColor=white)
-![Git](https://img.shields.io/badge/Git-Version_Control-F05032?style=for-the-badge&logo=git&logoColor=white)
-
-</p>
+Academic project — *Research Methodologies and Experimental Design, CSE-A.*
 
 ---
 
-## 📌 Executive Summary
+## What it is
 
-The **Movie Recommendation System** is a modular machine-learning platform designed to solve the information-overload problem in modern movie discovery.
+A production-grade implementation of a movie recommendation study with two products:
 
-Rather than implementing a single recommendation algorithm, the system is designed as an extensible recommendation platform where multiple algorithms can be trained, evaluated, compared, explained, and deployed through a common architecture.
+1. **Recommender Demo** — Choose a demo user, rate movies, get recommendations from any model with "Because you liked X" explanations, give feedback.
+2. **Experiment Lab** — Run the study: train all models under identical conditions, compute metrics, compare results in tables and charts, export artifacts.
 
-The platform contains two major surfaces:
-
-### 1. Recommendation Experience
-
-A user-facing application for:
-
-- discovering movies
-- searching titles
-- rating movies
-- generating personalized recommendations
-- comparing recommendation strategies
-- understanding why a movie was recommended
-- providing feedback
-
-### 2. Experimentation Platform
-
-A research-oriented environment for:
-
-- dataset preparation
-- controlled model training
-- reproducible experiments
-- recommendation evaluation
-- metric comparison
-- experiment tracking
-- result visualization
-- artifact generation
-
-The architecture deliberately separates **ML logic, application services, API contracts, persistence, and presentation** so that recommendation algorithms can evolve independently from the product layer.
+**Every number shown in the UI comes from an experiment run stored on disk. No values are fabricated or hard-coded.**
 
 ---
 
-# 🧭 Table of Contents
+## Quickstart (5 commands)
 
-- [Executive Summary](#-executive-summary)
-- [Problem Statement](#-problem-statement)
-- [Research Question](#-research-question)
-- [System Goals](#-system-goals)
-- [Core Capabilities](#-core-capabilities)
-- [System Architecture](#-system-architecture)
-- [Architecture Principles](#-architecture-principles)
-- [Technology Stack](#-technology-stack)
-- [Technology Responsibilities](#-technology-responsibilities)
-- [End-to-End System Workflow](#-end-to-end-system-workflow)
-- [Data Architecture](#-data-architecture)
-- [Recommendation Architecture](#-recommendation-architecture)
-- [Content-Based Filtering](#-content-based-filtering)
-- [Collaborative Filtering](#-collaborative-filtering)
-- [Matrix Factorization](#-matrix-factorization)
-- [Hybrid Recommendation](#-hybrid-recommendation)
-- [Cold Start Strategy](#-cold-start-strategy)
-- [Sentiment Analysis](#-sentiment-analysis)
-- [Explainability](#-explainability)
-- [Experiment Architecture](#-experiment-architecture)
-- [Evaluation Framework](#-evaluation-framework)
-- [Research Methodology](#-research-methodology)
-- [Frontend Architecture](#-frontend-architecture)
-- [Backend Architecture](#-backend-architecture)
-- [API Design](#-api-design)
-- [Database Architecture](#-database-architecture)
-- [Project Structure](#-project-structure)
-- [Security Architecture](#-security-architecture)
-- [Performance Engineering](#-performance-engineering)
-- [Testing Strategy](#-testing-strategy)
-- [Reproducibility](#-reproducibility)
-- [Observability](#-observability)
-- [DevOps & CI/CD](#-devops--cicd)
-- [Local Development](#-local-development)
-- [Environment Configuration](#-environment-configuration)
-- [Experiment Execution](#-experiment-execution)
-- [API Documentation](#-api-documentation)
-- [Engineering Quality Gates](#-engineering-quality-gates)
-- [Research Integrity](#-research-integrity)
-- [Privacy & Ethics](#-privacy--ethics)
-- [Known Limitations](#-known-limitations)
-- [Roadmap](#-roadmap)
-- [Project Status](#-project-status)
-- [Contributing](#-contributing)
-- [License](#-license)
+```bash
+# 1. Clone
+git clone <this-repo> && cd movie-rec
+
+# 2. Install dependencies
+make setup
+
+# 3. Download MovieLens ml-latest-small (~6 MB)
+make data
+
+# 4. Start dev servers (backend :8000, frontend :3000)
+make dev
+
+# 5. (Optional) Run a full experiment
+make experiment
+```
+
+Open `http://localhost:3000` in your browser.
+API docs: `http://localhost:8000/docs`
 
 ---
 
-# 🎯 Problem Statement
+## Architecture
 
-Streaming platforms expose users to thousands of movies.
-
-The large number of choices creates an information-overload problem:
-
-```text
-Thousands of Movies
-        │
-        ▼
-Too Many Choices
-        │
-        ▼
-Difficulty Identifying Relevant Content
-        │
-        ▼
-Lower Discovery Efficiency
-        │
-        ▼
-Need for Personalization
-
-A recommendation system attempts to reduce this problem by learning relationships between:
-
-USER PREFERENCES
-       │
-       ▼
-MOVIE INTERACTIONS
-       │
-       ▼
-FEATURE REPRESENTATION
-       │
-       ▼
-RECOMMENDATION MODEL
-       │
-       ▼
-RANKED CANDIDATES
-       │
-       ▼
-PERSONALIZED DISCOVERY
-
-
----
-
-🔬 Research Question
-
-> Can personalized recommendation using collaborative, content-based, or hybrid filtering improve recommendation accuracy and user satisfaction compared with a non-personalized recommendation approach?
-
-
-
-The system is therefore designed not only to produce recommendations, but also to provide an experimental framework capable of measuring the performance of different approaches.
-
-
----
-
-🎯 System Goals
-
-The system is designed around five engineering objectives:
-
-01 — Recommendation Quality
-
-Generate relevant movie recommendations based on available user and movie information.
-
-02 — Personalization
-
-Use historical user interactions to adapt recommendations to individual preferences.
-
-03 — Explainability
-
-Provide understandable reasoning behind recommendation decisions.
-
-04 — Experimental Rigor
-
-Evaluate models under controlled and reproducible conditions.
-
-05 — Extensibility
-
-Allow additional recommendation algorithms to be introduced without rewriting the application architecture.
-
-
----
-
-🚀 Core Capabilities
-
-Capability	Purpose
-
-Movie Discovery	Search and explore movies
-Content-Based Recommendation	Recommend similar movies
-Collaborative Filtering	Learn from user-item interactions
-Matrix Factorization	Learn latent preference representations
-Hybrid Recommendation	Combine multiple recommendation signals
-Cold-Start Handling	Handle new users and movies
-Sentiment Analysis	Analyze movie-review sentiment
-Recommendation Explanation	Explain recommendation signals
-Model Comparison	Compare recommendation strategies
-Experiment Lab	Execute controlled experiments
-Evaluation	Calculate recommendation metrics
-Experiment Artifacts	Persist reproducible results
-Dataset Analysis	Inspect dataset characteristics
-Feedback	Capture recommendation relevance
-API	Expose recommendation functionality
-Documentation	Explain architecture and methodology
-
-
-
----
-
-🏗️ System Architecture
-
-flowchart TB
-
-    USER["👤 User"]
-
-    subgraph PRESENTATION["Presentation Layer"]
-        WEB["Web Application"]
-        DEMO["Recommendation Experience"]
-        COMPARE["Model Comparison"]
-        LAB["Experiment Lab"]
-        DOCS["Methodology & Documentation"]
+```mermaid
+graph TD
+    subgraph Frontend ["Frontend (Next.js 14, TypeScript, Tailwind)"]
+        Demo["Demo Page"]
+        Compare["Blind Compare"]
+        Lab["Experiment Lab"]
+        Method["Methodology"]
     end
 
-    subgraph API["API Layer"]
-        ROUTER["API Router"]
-        VALIDATOR["Request Validation"]
-        AUTH["Security / Policy Layer"]
+    subgraph Backend ["Backend (FastAPI, Python 3.12)"]
+        API["api/v1 — Routes"]
+        SVC["services — Business Logic"]
+        DB[(SQLite via SQLAlchemy)]
+        ML["ml/ — Models & Evaluation"]
+        FS[/"experiments/ — Artifacts"/]
     end
 
-    subgraph APPLICATION["Application Layer"]
-        REC_SERVICE["Recommendation Service"]
-        MOVIE_SERVICE["Movie Service"]
-        EXP_SERVICE["Experiment Service"]
-        FEEDBACK_SERVICE["Feedback Service"]
-        EVAL_SERVICE["Evaluation Service"]
-    end
+    Frontend -->|HTTP /api/v1| API
+    API --> SVC
+    SVC --> DB
+    SVC --> ML
+    ML --> FS
+```
 
-    subgraph ML["Machine Learning Layer"]
-        POP["Popularity Baseline"]
-        USER_KNN["User KNN"]
-        ITEM_KNN["Item KNN"]
-        MF["Matrix Factorization"]
-        CONTENT["Content Based"]
-        HYBRID["Hybrid"]
-        SENTIMENT["Sentiment Analysis"]
-    end
-
-    subgraph DATA["Data & Feature Layer"]
-        PREPROCESS["Preprocessing"]
-        FEATURES["Feature Engineering"]
-        MATRIX["User-Item Matrix"]
-        SPLIT["Train / Validation / Test"]
-    end
-
-    subgraph STORAGE["Persistence Layer"]
-        DB["SQL Database"]
-        MODEL_STORE["Model Artifacts"]
-        EXP_STORE["Experiment Artifacts"]
-    end
-
-    USER --> WEB
-
-    WEB --> DEMO
-    WEB --> COMPARE
-    WEB --> LAB
-    WEB --> DOCS
-
-    DEMO --> ROUTER
-    COMPARE --> ROUTER
-    LAB --> ROUTER
-
-    ROUTER --> VALIDATOR
-    VALIDATOR --> AUTH
-
-    AUTH --> REC_SERVICE
-    AUTH --> MOVIE_SERVICE
-    AUTH --> EXP_SERVICE
-    AUTH --> FEEDBACK_SERVICE
-    AUTH --> EVAL_SERVICE
-
-    REC_SERVICE --> POP
-    REC_SERVICE --> USER_KNN
-    REC_SERVICE --> ITEM_KNN
-    REC_SERVICE --> MF
-    REC_SERVICE --> CONTENT
-    REC_SERVICE --> HYBRID
-
-    MOVIE_SERVICE --> SENTIMENT
-
-    EXP_SERVICE --> EVAL_SERVICE
-    EXP_SERVICE --> ML
-
-    PREPROCESS --> FEATURES
-    PREPROCESS --> MATRIX
-    PREPROCESS --> SPLIT
-
-    SPLIT --> ML
-    FEATURES --> CONTENT
-    MATRIX --> ML
-
-    FEEDBACK_SERVICE --> DB
-    MOVIE_SERVICE --> DB
-
-    EXP_SERVICE --> EXP_STORE
-    ML --> MODEL_STORE
-
+**Layer rule:** `api` → `services` → (`repositories` | `ml`). ML code never imports from `app` or `db`.
 
 ---
 
-🧱 Architecture Principles
+## Models
 
-The system follows several production engineering principles.
-
-Separation of Concerns
-
-The API must not contain ML implementation logic.
-
-API
- ↓
-Service
- ↓
-ML / Repository
-
-Dependency Inversion
-
-Recommendation algorithms depend on a common interface rather than being directly coupled to API routes.
-
-Modular ML
-
-Adding a new recommender should require:
-
-New Model
-   +
-Registry Entry
-
-rather than rewriting existing services.
-
-Reproducibility
-
-Experiments must record:
-
-dataset version
-
-preprocessing configuration
-
-random seed
-
-model
-
-parameters
-
-evaluation protocol
-
-metrics
-
-execution metadata
-
-
-Research Integrity
-
-The system must never fabricate experimental results.
-
+| Model | Type | Notes |
+|---|---|---|
+| PopularityBaseline | Non-personalized | Bayesian damped mean — control group |
+| UserKNN | Collaborative filtering | User-based cosine KNN |
+| ItemKNN | Collaborative filtering | Item-based adjusted-cosine KNN |
+| MatrixFactorization | Collaborative filtering | SVD-style via NumPy/SciPy |
+| ContentBased | Content-based | TF-IDF genres → cosine profile matching |
+| Hybrid | Hybrid | Weighted CF + CB, alpha tuned on val split |
 
 ---
 
-🧰 Technology Stack
+## Reproducing an experiment
 
-Frontend
+```bash
+make reproduce RUN=<experiment-id>
+# Example: make reproduce RUN=20241004_120000_abc123
+```
 
-Next.js TypeScript Tailwind CSS Recharts
-
-Next.js
-
-React
-
-TypeScript
-
-Tailwind CSS
-
-Recharts
-
-Accessible reusable component system
-
-
+This re-runs the experiment from its `config.json` and verifies metrics match within tolerance.
 
 ---
 
-Backend
+## Running tests
 
-Python FastAPI Pydantic
-
-Python
-
-FastAPI
-
-Pydantic
-
-REST API
-
-OpenAPI
-
-
+```bash
+make test         # backend (pytest) + frontend (vitest)
+make lint         # ruff + mypy + eslint + tsc
+```
 
 ---
 
-Machine Learning
+## Dataset
 
-scikit-learn NumPy Pandas
+**MovieLens ml-latest-small** — ~100k ratings, ~9k movies, ~600 users.
+Downloaded by `scripts/download_data.py`. **Not committed to this repository.**
 
-scikit-learn
+> Citation: F. Maxwell Harper and Joseph A. Konstan. 2015. The MovieLens Datasets: History and Context.
+> ACM Transactions on Interactive Intelligent Systems, 5(4): 19:1–19:19. https://doi.org/10.1145/2827872
 
-NumPy
-
-SciPy
-
-Pandas
-
-TF-IDF / CountVectorization
-
-Cosine Similarity
-
-Collaborative Filtering
-
-Matrix Factorization
-
-Sentiment Analysis
-
-
+License: [GroupLens Terms of Use](https://grouplens.org/datasets/movielens/)
 
 ---
 
-Database & Persistence
+## Documentation
 
-SQLite PostgreSQL SQLAlchemy
-
-SQLAlchemy
-
-SQLite
-
-PostgreSQL-compatible architecture
-
-Alembic migrations
-
-
+| File | Contents |
+|---|---|
+| `docs/DECISIONS.md` | All architectural decisions with reasons and alternatives |
+| `docs/methodology.md` | Full study design (variables, controls, validity, ethics) |
+| `docs/ETHICS.md` | Privacy and ethics commitments |
+| `docs/RESULTS_TEMPLATE.md` | Report skeleton auto-filled from experiment artifacts |
+| `docs/DEPLOY.md` | Deployment guide (single VM or managed container) |
 
 ---
 
-Infrastructure
+## Performance targets (measured after Phase 6)
 
-Docker GitHub Actions Git
-
-Docker
-
-Docker Compose
-
-Git
-
-GitHub
-
-GitHub Actions
-
-Automated testing and quality checks
-
-
+| Metric | Target |
+|---|---|
+| Single recommendation request (warm) | < 200 ms |
+| Full model training (all models, laptop CPU) | < 5 minutes |
+| Frontend Lighthouse performance | ≥ 90 |
+| Frontend Lighthouse accessibility | ≥ 90 |
 
 ---
 
-🔄 End-to-End System Workflow
+## Out of scope
 
-flowchart LR
-
-    A["Dataset"] 
-    --> B["Acquisition"]
-
-    B --> C["Validation"]
-
-    C --> D["Preprocessing"]
-
-    D --> E["Feature Engineering"]
-
-    E --> F["Train / Validation / Test"]
-
-    F --> G["Model Training"]
-
-    G --> H["Recommendation"]
-
-    H --> I["Ranking"]
-
-    I --> J["Explanation"]
-
-    J --> K["User Feedback"]
-
-    K --> L["Evaluation"]
-
-    L --> M["Experiment Artifact"]
-
-    M --> N["Analytics Dashboard"]
-
-
----
-
-🗄️ Data Architecture
-
-flowchart TD
-
-    RAW["Raw MovieLens Data"]
-
-    RAW --> VALIDATE["Schema Validation"]
-
-    VALIDATE --> CLEAN["Data Cleaning"]
-
-    CLEAN --> USERS["Users"]
-
-    CLEAN --> MOVIES["Movies"]
-
-    CLEAN --> RATINGS["Ratings"]
-
-    MOVIES --> GENRES["Genres / Metadata"]
-
-    USERS --> MATRIX["User-Item Matrix"]
-
-    RATINGS --> MATRIX
-
-    GENRES --> FEATURES["Movie Feature Matrix"]
-
-    MATRIX --> SPLIT["Experimental Split"]
-
-    FEATURES --> SPLIT
-
-    SPLIT --> TRAIN["Training Data"]
-    SPLIT --> VALIDATION["Validation Data"]
-    SPLIT --> TEST["Test Data"]
-
-
----
-
-🤖 Recommendation Architecture
-
-All models follow a common recommender contract.
-
-Conceptually:
-
-fit(train_data)
-
-predict(user_id, item_id)
-
-recommend(
-    user_id,
-    k,
-    exclude_seen=True
-)
-
-explain(
-    user_id,
-    item_id
-)
-
-get_params()
-
-This allows the application to interact with every model through a consistent interface.
-
-
----
-
-🎞️ Content-Based Filtering
-
-The content-based system represents movies using their characteristics.
-
-flowchart LR
-
-    MOVIE["Movie Metadata"]
-    --> TEXT["Text Representation"]
-
-    TEXT --> VECT["TF-IDF / CountVectorizer"]
-
-    VECT --> MATRIX["Feature Matrix"]
-
-    MATRIX --> SIM["Cosine Similarity"]
-
-    SIM --> RANK["Similarity Ranking"]
-
-    RANK --> TOPK["Top-K Movies"]
-
-Typical signals may include:
-
-genres
-
-tags
-
-keywords
-
-descriptions
-
-metadata
-
-
-The model recommends movies that are similar to content associated with the user's known preferences.
-
-
----
-
-👥 Collaborative Filtering
-
-Collaborative filtering learns from interactions between users and movies.
-
-flowchart TD
-
-    USERS["Users"]
-    MOVIES["Movies"]
-    RATINGS["Ratings"]
-
-    USERS --> MATRIX["User × Movie Matrix"]
-    MOVIES --> MATRIX
-    RATINGS --> MATRIX
-
-    MATRIX --> SIM["Similarity / Latent Factors"]
-
-    SIM --> PREDICT["Preference Prediction"]
-
-    PREDICT --> RANK["Ranking"]
-
-    RANK --> REC["Recommendations"]
-
-Supported strategies include:
-
-User-based KNN
-
-Item-based KNN
-
-Matrix Factorization
-
-
-
----
-
-🧮 Matrix Factorization
-
-Matrix factorization decomposes the sparse user-item interaction matrix into latent representations.
-
-User Factors
-                     │
-                     ▼
-             ┌──────────────┐
-             │ Latent Space │
-             └──────────────┘
-                     ▲
-                     │
-                 Item Factors
-                     │
-                     ▼
-             Predicted Preference
-
-Conceptually:
-
-R ≈ U × Vᵀ
-
-where:
-
-R = observed rating matrix
-
-U = user latent factors
-
-V = item latent factors
-
-
-
----
-
-🔀 Hybrid Recommendation
-
-The hybrid model combines independent recommendation signals.
-
-flowchart LR
-
-    CONTENT["Content Score"]
-    COLLAB["Collaborative Score"]
-    POP["Popularity Signal"]
-
-    CONTENT --> FUSION["Weighted Score Fusion"]
-    COLLAB --> FUSION
-    POP --> FUSION
-
-    FUSION --> RANK["Final Ranking"]
-
-    RANK --> REC["Top-K Recommendations"]
-
-Conceptually:
-
-Hybrid Score =
-    α × Content Score
-  + β × Collaborative Score
-  + γ × Popularity Score
-
-The weights should be configurable and tuned using validation data rather than the final test set.
-
-
----
-
-🧊 Cold Start Strategy
-
-Recommendation systems face two major cold-start problems.
-
-New User
-
-New User
-   ↓
-No / Few Ratings
-   ↓
-Popularity Baseline
-   +
-Explicit Preferences
-   +
-Content-Based Signals
-   ↓
-Initial Recommendations
-
-New Movie
-
-New Movie
-   ↓
-No Interaction History
-   ↓
-Metadata / Content Features
-   ↓
-Content-Based Similarity
-   ↓
-Recommendations
-
-
----
-
-💬 Sentiment Analysis
-
-Where review data is available, sentiment analysis provides an additional movie-level signal.
-
-flowchart LR
-
-    REVIEW["Movie Review"]
-
-    REVIEW --> CLEAN["Text Preprocessing"]
-
-    CLEAN --> VECTOR["Vectorization"]
-
-    VECTOR --> MODEL["Sentiment Model"]
-
-    MODEL --> CLASS["Positive / Negative"]
-
-    CLASS --> AGG["Aggregate Sentiment"]
-
-    AGG --> INSIGHT["Movie Sentiment Insight"]
-
-Sentiment analysis is treated as a separate ML capability from recommendation ranking unless explicitly integrated into the recommendation model.
-
-
----
-
-💡 Recommendation Explainability
-
-A recommendation system should not simply return:
-
-Movie A
-Movie B
-Movie C
-
-It should communicate the underlying recommendation signal.
-
-Example:
-
-Why this movie?
-
-✓ Similar genres
-✓ Similar movies you rated highly
-✓ Strong collaborative similarity
-✓ Positive preference signal
-
-Where quantitative scores are shown, they must originate from actual model outputs.
-
-
----
-
-🧪 Experiment Architecture
-
-The Experiment Lab is the research core of the platform.
-
-flowchart TD
-
-    CONFIG["Experiment Configuration"]
-
-    CONFIG --> DATASET["Dataset Version"]
-
-    DATASET --> PREPROCESS["Deterministic Preprocessing"]
-
-    PREPROCESS --> SPLIT["Fixed Train / Validation / Test Split"]
-
-    SPLIT --> MODELS["Model Training"]
-
-    MODELS --> PRED["Predictions / Rankings"]
-
-    PRED --> METRICS["Metric Calculation"]
-
-    METRICS --> STATS["Statistical Analysis"]
-
-    STATS --> ARTIFACT["Experiment Artifact"]
-
-    ARTIFACT --> DASHBOARD["Experiment Dashboard"]
-
-    ARTIFACT --> EXPORT["CSV / JSON / Report"]
-
-
----
-
-📊 Evaluation Framework
-
-The system evaluates recommendation algorithms using measurable metrics.
-
-Prediction Error
-
-MAE
-
-Mean Absolute Error measures the average absolute difference between predicted and observed ratings.
-
-MAE ↓
-Lower is better
-
-RMSE
-
-Root Mean Squared Error penalizes larger prediction errors more strongly.
-
-RMSE ↓
-Lower is better
-
-
----
-
-Ranking Quality
-
-Precision@K
-
-Measures how many of the top-K recommendations are relevant.
-
-Precision@K ↑
-Higher is better
-
-Recall@K
-
-Measures how many relevant items were successfully retrieved.
-
-Recall@K ↑
-Higher is better
-
-NDCG@K
-
-Measures ranking quality while giving greater importance to relevant items appearing near the top.
-
-NDCG@K ↑
-Higher is better
-
-
----
-
-Coverage
-
-Measures the proportion of available items that the recommendation system can expose through recommendations.
-
-Coverage ↑
-Higher is generally better
-
-
----
-
-🔬 Research Methodology
-
-The project follows a quantitative, computational experimental approach.
-
-Research Paradigm
-
-Quantitative
-
-Experimental Design
-
-Quasi-Experimental
-Simulation-Based Computational Evaluation
-
-Independent Variable
-
-Recommendation Algorithm
-
-Dependent Variables
-
-Accuracy
-Precision
-Recall
-MAE
-RMSE
-Relevance
-User Satisfaction
-
-Controlled Conditions
-
-Same Dataset
-Same Preprocessing
-Same Train/Test Protocol
-Same Evaluation Metrics
-Same Comparison Procedure
-
-
----
-
-🧪 Experimental Protocol
-
-The comparison should follow:
-
-Dataset
-   ↓
-Validation
-   ↓
-Deterministic Preprocessing
-   ↓
-Fixed Split
-   ↓
-Train Models
-   ↓
-Generate Predictions
-   ↓
-Generate Rankings
-   ↓
-Calculate Metrics
-   ↓
-Compare Models
-   ↓
-Analyze Results
-
-The test set must remain isolated from model training and parameter tuning.
-
-
----
-
-🖥️ Frontend Architecture
-
-The frontend is organized around two experiences.
-
-APPLICATION
-                         │
-             ┌───────────┴───────────┐
-             │                       │
-             ▼                       ▼
-     RECOMMENDATION               RESEARCH
-       EXPERIENCE                EXPERIENCE
-             │                       │
-       ┌─────┴─────┐          ┌──────┴──────┐
-       │           │          │             │
-     Movies    Recommendations Compare   Experiment Lab
-       │           │          │             │
-       └─────┬─────┘          └──────┬──────┘
-             │                       │
-             └───────────┬───────────┘
-                         ▼
-                  Shared Design
-
-
- 
+Real user accounts/auth, payments, video streaming, GPU models, multi-language UI,
+mobile apps, production cloud deployment, scraping, any dataset other than MovieLens ml-latest-small.

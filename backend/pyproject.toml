@@ -1,0 +1,88 @@
+[project]
+name = "movie-rec-backend"
+version = "0.1.0"
+description = "Movie Recommendation System + Experiment Lab — backend"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    # Web framework
+    "fastapi==0.115.12",
+    "uvicorn[standard]==0.34.2",
+    "python-multipart==0.0.20",
+    # Data validation
+    "pydantic==2.11.3",
+    "pydantic-settings==2.9.1",
+    # Database
+    "sqlalchemy==2.0.40",
+    "alembic==1.15.2",
+    "aiosqlite==0.21.0",
+    # ML
+    "numpy==2.2.4",
+    "scipy==1.15.2",
+    "scikit-learn==1.6.1",
+    "pandas==2.2.3",
+    # HTTP (for download script)
+    "httpx==0.28.1",
+    "tqdm==4.67.1",
+    # Rate limiting
+    "slowapi==0.1.9",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest==8.3.5",
+    "pytest-asyncio==0.25.3",
+    "pytest-cov==6.1.0",
+    "httpx==0.28.1",
+    "ruff==0.11.5",
+    "mypy==1.15.0",
+    "pandas-stubs==2.2.3.250308",
+    "types-tqdm==4.67.0.20250404",
+]
+
+[tool.uv]
+dev-dependencies = [
+    "pytest==8.3.5",
+    "pytest-asyncio==0.25.3",
+    "pytest-cov==6.1.0",
+    "ruff==0.11.5",
+    "mypy==1.15.0",
+    "pandas-stubs==2.2.3.250308",
+    "types-tqdm==4.67.0.20250404",
+]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+src = ["app", "ml", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "C4", "PIE", "RET", "SIM", "TCH", "PTH"]
+ignore = ["E501", "B008", "PTH123"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101"]  # allow assert in tests
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+# Relaxed for app/ (only strict on ml/)
+[[tool.mypy.overrides]]
+module = "app.*"
+strict = false
+disallow_untyped_defs = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+addopts = "--tb=short -q"
+
+[tool.coverage.run]
+source = ["app", "ml"]
+omit = ["tests/*", "alembic/*"]
+
+[tool.coverage.report]
+fail_under = 85
+show_missing = true

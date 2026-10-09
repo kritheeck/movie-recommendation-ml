@@ -1,0 +1,58 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.venv/
+.env
+*.pkl
+*.joblib
+
+# Data & Experiments (never commit raw data)
+data/raw/
+data/processed/
+experiments/*
+!experiments/.gitkeep
+
+# Database
+*.db
+*.sqlite3
+
+# uv
+.uv/
+
+# Node
+node_modules/
+.next/
+out/
+.pnpm-store/
+
+# Docker
+.docker/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Coverage
+.coverage
+htmlcov/
+coverage.xml
+.pytest_cache/
+
+# mypy
+.mypy_cache/
