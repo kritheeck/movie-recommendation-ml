@@ -1,4 +1,3 @@
-from email.mime import application
 import numpy as np
 import pandas as pd
 from flask import Flask, render_template, request
@@ -55,6 +54,7 @@ def get_suggestions():
     return list(data['movie_title'].str.capitalize())
 
 app = Flask(__name__)
+application = app
 
 @app.route("/")
 @app.route("/home")
